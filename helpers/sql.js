@@ -1,13 +1,16 @@
 const { BadRequestError } = require("../expressError");
 
-// THIS NEEDS SOME GREAT DOCUMENTATION.
 /*  Takes object data and converts it to sanitized SQL.
+    Helper to make updates selectively
 
-  If object has no keys, meaning data is empty, throws an error.
+    Takes data to update and javascript to be updated to SQL naming as params
 
-  Returns object with key and value converted to SQL.
+    If object has no keys, meaning data is empty, throws an error.
 
-  Used to update a model with partial information
+    Returns object with key and value converted to SQL.
+    Returns {setCols, values}
+
+    Used to update a model with partial information
 */
 function sqlForPartialUpdate(dataToUpdate, jsToSql) {
   const keys = Object.keys(dataToUpdate);

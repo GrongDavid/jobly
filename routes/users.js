@@ -5,7 +5,7 @@
 const jsonschema = require("jsonschema");
 
 const express = require("express");
-const { ensureLoggedIn, checkAdmin } = require("../middleware/auth");
+const { ensureLoggedIn, checkAdmin, ensureUserOrAdmin } = require("../middleware/auth");
 const { BadRequestError } = require("../expressError");
 const User = require("../models/user");
 const { createToken } = require("../helpers/tokens");
@@ -85,10 +85,10 @@ router.get("/:username", ensureLoggedIn, async function (req, res, next) {
  *
  * Returns { username, firstName, lastName, email, isAdmin }
  *
- * Authorization required: login
+ * Authorization required: correct user or admin
  **/
 
-router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
+router.patch("/:username", ensureUserOrAdmin, async function (req, res, next) {
   try {
     const validator = jsonschema.validate(req.body, userUpdateSchema);
     if (!validator.valid) {
@@ -103,7 +103,15 @@ router.patch("/:username", ensureLoggedIn, async function (req, res, next) {
   }
 });
 
-router.post('/:username/jobs/:id', ensureLoggedIn, async function (req, res, next){
+/** PATCH /[username]/jobs/[id]
+ *  Marks a certain job by id as applied for a user
+ *
+ *  Returns {applied: [id]}
+ *
+ *  Authorization required: User or admin
+ */
+
+router.post('/:username/jobs/:id', ensureUserOrAdmin, async function (req, res, next){
   try {
     const id = req.params.id
     const username = req.params.username
@@ -117,10 +125,10 @@ router.post('/:username/jobs/:id', ensureLoggedIn, async function (req, res, nex
 
 /** DELETE /[username]  =>  { deleted: username }
  *
- * Authorization required: login
+ * Authorization required: correct user or admin
  **/
 
-router.delete("/:username", ensureLoggedIn, async function (req, res, next) {
+router.delete("/:username", ensureUserOrAdmin, async function (req, res, next) {
   try {
     await User.remove(req.params.username);
     return res.json({ deleted: req.params.username });

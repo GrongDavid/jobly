@@ -47,6 +47,19 @@ function checkAdmin(req, res, next) {
     if(!res.locals.user || !res.locals.user.isAdmin){
       throw new UnauthorizedError('You must be logged in and an admin to access this')
     }
+    return next()
+  } catch (error) {
+    return next(error)
+  }
+}
+
+function ensureUserOrAdmin(req, res, next){
+  try {
+    const user = res.locals.user
+    if(user.username === req.params.username || user.isAdmin){
+      return next()
+    }
+    throw new UnauthorizedError('You must be the correct user or admin to access')
   } catch (error) {
     return next(error)
   }
@@ -56,5 +69,6 @@ function checkAdmin(req, res, next) {
 module.exports = {
   authenticateJWT,
   ensureLoggedIn,
-  checkAdmin
+  checkAdmin,
+  ensureUserOrAdmin
 };

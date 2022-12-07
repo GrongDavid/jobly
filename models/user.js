@@ -205,6 +205,15 @@ class User {
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
 
+  /** Allows a user to apply for a job given their username and the job id
+   *
+   * checks to see if job and user exists first, throw error if not
+   *
+   * inserts into database if successfull
+   *
+   * no return value, used for side effect
+   */
+
   static async apply(username, id){
     const jobExists = await db.query(`
     SELECT id
